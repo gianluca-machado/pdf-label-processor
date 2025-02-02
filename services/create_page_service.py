@@ -1,4 +1,5 @@
-from pypdf import PdfWriter, PageObject
+from pypdf import PageObject, PdfWriter
+
 
 class PDFPageCreator:
     def __init__(self):
@@ -17,9 +18,9 @@ class PDFPageCreator:
         """
         print("[INFO] Iniciando o processo de criação de uma página em branco no formato A4.")
 
-        # Dimensões de uma página A4 em pontos (595 x 842, orientação retrato)
+        # Dimensões de uma página A4 em pontos (595 x 845, orientação retrato)
         a4_width_points = 595
-        a4_height_points = 842
+        a4_height_points = 845
         print(f"[INFO] Dimensões da página A4 definidas: {a4_width_points} x {a4_height_points} pontos.")
 
         # Cria uma página em branco no formato A4
