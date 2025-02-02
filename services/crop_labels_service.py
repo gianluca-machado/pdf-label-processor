@@ -1,6 +1,8 @@
-from pypdf import PdfWriter, PdfReader
-from pypdf.generic import RectangleObject
 import os
+
+from pypdf import PdfReader, PdfWriter
+from pypdf.generic import RectangleObject
+
 
 class PDFCropper:
     def __init__(self, input_pdf_path, output_folder_path):
