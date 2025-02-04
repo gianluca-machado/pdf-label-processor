@@ -53,14 +53,11 @@ class PDFCropper:
 
         with open(output_file_path, "wb") as output_file:
             writer.write(output_file)
+        writer.close()
 
         print(f"[INFO] Cropped PDF saved as '{output_file_path}'.")
 
     def crop_labels(self):
-        """
-        Crop all even-numbered pages (0, 2, 4, ...) and save them as individual PDFs.
-        Each page is divided into three labels with predefined crop box coordinates.
-        """
         print(f"[INFO] Starting cropping process for PDF: '{self.input_pdf_path}'")
         print(f"[INFO] Total pages in the input PDF: {self.total_pages}")
 
@@ -75,7 +72,7 @@ class PDFCropper:
         ]
 
         label_counter = 1
-        for page_index in range(0, self.total_pages, 2):  # Process only even-numbered pages
+        for page_index in range(0, self.total_pages - 1):
             for crop_box_coordinates in crop_box_templates:
                 output_file_path = os.path.join(self.output_folder_path, f"label_{label_counter}.pdf")
                 self._crop_and_save_page(page_index, output_file_path, crop_box_coordinates)
