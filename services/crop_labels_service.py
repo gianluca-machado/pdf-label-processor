@@ -61,7 +61,7 @@ class PDFCropper:
                     complete_text += text
         
         # Define the expected texts
-        expected_texts = ["NF:", "NFe:"]
+        expected_texts = ["NF:", "NFe:", "JADLEVE"]
         print(f"[INFO] Checking if the area contains any of the expected texts: {expected_texts}")
         
         # Convert to lowercase for case-insensitive comparison
