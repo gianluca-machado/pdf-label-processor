@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 
 from pypdf import PageObject, PdfReader, PdfWriter, Transformation
+
+from config import LABELS_PER_PAGE, RESULT_COORDINATES, SCALE_FACTOR, CUSTOM_LABEL_POSITIONS
 from services.create_page_service import PDFPageCreator
 
 
@@ -20,14 +22,10 @@ class PDFLabelMerger:
         """
         self.labels_folder_path = labels_folder_path
         self.output_pdf_path = output_pdf_path
-        self.scale_factor = 0.91  # Fator de escala para ajustar as etiquetas
+        self.scale_factor = SCALE_FACTOR  # Fator de escala para ajustar as etiquetas
         # Coordenadas (tx, ty) para posicionar cada etiqueta na página A4
-        self.coordinates = [
-            {"tx": 10,  "ty": 445},  # 1ª etiqueta
-            {"tx": 345, "ty": 445},  # 2ª etiqueta
-            {"tx": 10,  "ty": 10},   # 3ª etiqueta
-            {"tx": 345, "ty": 10},   # 4ª etiqueta
-        ]
+        self.coordinates = RESULT_COORDINATES
+        self.custom_label_positions = CUSTOM_LABEL_POSITIONS
 
         # Cria a primeira página em branco para o PDF de saída (página A4)
         print("[INFO] Criando a primeira página em branco para o PDF de saída.")
@@ -45,26 +43,41 @@ class PDFLabelMerger:
         label_counter = 0
         page_index = 0  # Índice da página de destino atual
         coord_index = 0  # Índice das coordenadas para posicionamento da etiqueta
+        custom_position_index = 0  # Índice para percorrer as posições personalizadas
 
         # Itera pelos arquivos de etiqueta (ordenados para garantir a sequência)
         for label_file in sorted(Path(self.labels_folder_path).iterdir()):
-            if label_file.is_file():
-                print(f"[INFO] Mesclando etiqueta: {label_file.name}")
-                self.merge_content(
-                    label_pdf_path=str(label_file),
-                    target_page_index=page_index,
-                    coordinates=self.coordinates[coord_index]
-                )
+            # Somar o contador de etiquetas
+            label_counter += 1
 
-                label_counter += 1
-                coord_index += 1
+            # Verifica se existe uma posição personalizada para a página atual
+            custom_position, custom_position_len = self.get_custom_position(page_index)
+            
+            # Define coordenadas
+            coordinates = self.coordinates[coord_index] if not custom_position else self.coordinates[custom_position[custom_position_index]]
 
-                # Quando 4 etiquetas já foram inseridas na página corrente, acrescenta uma nova página em branco
-                if coord_index == 4:
-                    coord_index = 0
-                    page_index += 1
-                    if label_counter < self.num_of_labels:
-                        self.add_blank_page()
+            # Mescla a etiqueta na página de destino
+            print(f"[INFO] Mesclando etiqueta: {label_file.name}")
+            self.merge_content(
+                label_pdf_path=str(label_file),
+                target_page_index=page_index,
+                coordinates=coordinates,
+            )
+
+            # Atualiza os índices de controle
+            coord_index = coord_index + 1 if not custom_position else custom_position[custom_position_index] + 1
+            custom_position_index += 1 if custom_position else 0
+
+            # Quando o numero máximo de etiquetas já foram inseridas na página corrente, acrescenta uma nova página em branco
+            # Reseta o contador de etiquas e o índice de coordenadas
+            if coord_index == LABELS_PER_PAGE or (custom_position and custom_position_index == custom_position_len):
+                coord_index = 0
+                page_index += 1
+                custom_position_index = 0
+                custom_position = None
+                if label_counter < self.num_of_labels:
+                    self.add_blank_page()
+
         print("[INFO] Processo de mesclagem concluído com sucesso.")
 
     def add_blank_page(self):
@@ -184,3 +197,9 @@ class PDFLabelMerger:
         writer.close()
         output_reader.close()
         label_reader.close()
+
+    def get_custom_position(self, page_index: int):
+        try:
+            return self.custom_label_positions[page_index], self.custom_label_positions[page_index].__len__()
+        except Exception as e:
+            return None, 0

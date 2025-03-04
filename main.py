@@ -1,6 +1,6 @@
+from config import INPUT_PDF_PATH, CROPPED_LABELS_FOLDER, FINAL_OUTPUT_PDF_PATH
 from services.crop_labels_service import PDFCropper
 from services.generate_merged_labels_service import PDFLabelMerger
-
 
 def main():
     """
@@ -10,9 +10,9 @@ def main():
     """
 
     # Caminhos de entrada e saída
-    input_pdf_path = "in.pdf"  # Caminho para o PDF de entrada
-    cropped_labels_folder = "labels/"  # Pasta para salvar as etiquetas recortadas
-    final_output_pdf_path = "final.pdf"  # Caminho para o PDF final mesclado
+    input_pdf_path = INPUT_PDF_PATH  # Caminho para o PDF de entrada
+    cropped_labels_folder = CROPPED_LABELS_FOLDER  # Pasta para salvar as etiquetas recortadas
+    final_output_pdf_path = FINAL_OUTPUT_PDF_PATH  # Caminho para o PDF final mesclado
 
     print("[INFO] Iniciando o processamento do PDF.")
 

@@ -4,6 +4,9 @@ import pdfplumber
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import RectangleObject
 
+from config import (CROP_BOX_TEMPLATES, EXPECTED_TEXTS_LABEL,
+                    LABEL_HEIGHT_PROCCESS, LABEL_WIDTH_PROCCESS)
+
 
 class PDFCropper:
     def __init__(self, input_pdf_path, output_folder_path):
@@ -60,15 +63,12 @@ class PDFCropper:
                 if text:
                     complete_text += text
         
-        # Define the expected texts
-        expected_texts = ["NF:", "NFe:", "JADLEVE"]
-        print(f"[INFO] Checking if the area contains any of the expected texts: {expected_texts}")
-        
         # Convert to lowercase for case-insensitive comparison
         complete_text_lower = complete_text.lower()
         
         # Check if any of the expected texts are present in the extracted area
-        is_valid = any(expected.lower() in complete_text_lower for expected in expected_texts)
+        print(f"[INFO] Checking if the area contains any of the expected texts: {EXPECTED_TEXTS_LABEL}")
+        is_valid = any(expected.lower() in complete_text_lower for expected in EXPECTED_TEXTS_LABEL)
         return is_valid
 
     def _crop_and_save_page(self, page_index, output_file_path, crop_box_coordinates):
@@ -102,20 +102,13 @@ class PDFCropper:
         """
         Crop labels from all pages of the input PDF using the defined crop box templates.
         For each page, the width and height are logged. Only pages with dimensions
-        width == 841.8898 and height == 595.2756 are processed.
+        width == LABEL_WIDTH_PROCCESS and height == LABEL_HEIGHT_PROCCESS are processed.
         """
         print(f"[INFO] Starting cropping process for PDF: '{self.input_pdf_path}'")
         print(f"[INFO] Total pages in the input PDF: {self.total_pages}")
 
         self._ensure_output_folder_exists()
         self._clear_output_folder()
-
-        label_width = 265  # Width of each label
-        crop_box_templates = [
-            [27, 143, 290, 570],  # First label
-            [27 + label_width, 143, 290 + label_width, 570],  # Second label
-            [27 + (label_width * 2), 143, 290 + (label_width * 2), 570],  # Third label
-        ]
 
         label_counter = 1
         # Iterate through all pages
@@ -127,8 +120,8 @@ class PDFCropper:
             print(f"[INFO] Page {page_index + 1}: Width = {width}, Height = {height}")
             
             # Process only pages with the specified dimensions
-            if width == 841.8898 and height == 595.2756:
-                for crop_box_coordinates in crop_box_templates:
+            if width == LABEL_WIDTH_PROCCESS and height == LABEL_HEIGHT_PROCCESS:
+                for crop_box_coordinates in CROP_BOX_TEMPLATES:
                     output_file_path = os.path.join(self.output_folder_path, f"label_{label_counter}.pdf")
                     self._crop_and_save_page(page_index, output_file_path, crop_box_coordinates)
                     label_counter += 1
