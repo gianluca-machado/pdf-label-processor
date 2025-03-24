@@ -22,7 +22,7 @@ LABEL_WIDTH_PROCCESS = 841.8898
 LABEL_HEIGHT_PROCCESS = 595.2756
 
 # Expected texts to be present in the cropped label
-EXPECTED_TEXTS_LABEL = ["NF:", "NFe:", "JADLEVE"]
+EXPECTED_TEXTS_LABEL = ["NF:", "NFe:", "JADLEVE", "JADHUB"]
 
 # Scale factor to be applied to the label
 SCALE_FACTOR = 0.91
